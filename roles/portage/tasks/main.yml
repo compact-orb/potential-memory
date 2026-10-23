@@ -105,11 +105,9 @@
 - name: Extract detected repository and profile path
   ansible.builtin.set_fact:
     detected_repo: >-
-      {{ profile_stat.stat.lnk_target |
-         regex_replace('^.*repos/([^/]+)/profiles.*$', '\\1') }}
+      {{ profile_stat.stat.lnk_target.split('/profiles/')[0].split('/')[-1] }}
     detected_profile: >-
-      {{ profile_stat.stat.lnk_target |
-         regex_replace('^.*/profiles/', '') }}
+      {{ profile_stat.stat.lnk_target.split('/profiles/')[1] }}
 
 - name: Create /etc/portage/binrepos.conf directory
   ansible.builtin.file:
