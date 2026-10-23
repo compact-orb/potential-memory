@@ -1,6 +1,6 @@
 ---
 - name: Configuration
-  hosts: localhost
+  hosts: all
   connection: local
   become: true
 
