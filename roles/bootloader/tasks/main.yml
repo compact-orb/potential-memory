@@ -1,4 +1,12 @@
 ---
+- name: Ensure /usr/local/bin exists
+  ansible.builtin.file:
+    path: /usr/local/bin
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+
 - name: Copy update-bootloader.sh to /usr/local/bin
   ansible.builtin.copy:
     src: update-bootloader.sh
