@@ -1,0 +1,33 @@
+---
+- name: Copy update-bootloader.sh to /usr/local/bin
+  ansible.builtin.copy:
+    src: update-bootloader.sh
+    dest: /usr/local/bin/update-bootloader.sh
+    mode: '0755'
+
+- name: Copy update-bootloader.service to /etc/systemd/system
+  ansible.builtin.copy:
+    src: update-bootloader.service
+    dest: /etc/systemd/system/update-bootloader.service
+    mode: '0644'
+
+- name: Copy update-bootloader.path to /etc/systemd/system
+  ansible.builtin.copy:
+    src: update-bootloader.path
+    dest: /etc/systemd/system/update-bootloader.path
+    mode: '0644'
+
+- name: Mask systemd-boot-update.service
+  ansible.builtin.systemd_service:
+    name: systemd-boot-update.service
+    masked: true
+
+- name: Enable update-bootloader.path
+  ansible.builtin.systemd_service:
+    name: update-bootloader.path
+    enabled: true
+
+- name: Run update-bootloader initial synchronization
+  ansible.builtin.command:
+    cmd: /usr/local/bin/update-bootloader.sh
+  changed_when: true
