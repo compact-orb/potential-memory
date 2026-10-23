@@ -41,7 +41,7 @@
   ansible.builtin.shell: |
     fpr=$(gpg --batch --homedir /etc/portage/gnupg \
       --with-colons --show-keys /etc/portage/keys/binpkg.asc | \
-      awk -F: '/^fpr/ {print $10; exit}')
+      awk --field-separator=":" '/^fpr/ {print $10; exit}')
     printf "%s\n" "${fpr}:6:" | \
       gpg --batch --homedir /etc/portage/gnupg --import-ownertrust
   changed_when: false
