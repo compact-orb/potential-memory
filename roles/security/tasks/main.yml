@@ -64,22 +64,22 @@
 - name: Configure password hashing maximum rounds in /etc/login.defs
   ansible.builtin.lineinfile:
     path: /etc/login.defs
-    regexp: '^\s*#?\s*SHA_CRYPT_MAX_ROUNDS\s+'
+    regexp: '^#?\s*SHA_CRYPT_MAX_ROUNDS\s+[0-9]+'
     line: 'SHA_CRYPT_MAX_ROUNDS 50000'
     state: present
 
 - name: Configure password hashing minimum rounds in /etc/login.defs
   ansible.builtin.lineinfile:
     path: /etc/login.defs
-    regexp: '^\s*#?\s*SHA_CRYPT_MIN_ROUNDS\s+'
+    regexp: '^#?\s*SHA_CRYPT_MIN_ROUNDS\s+[0-9]+'
     line: 'SHA_CRYPT_MIN_ROUNDS 50000'
     state: present
 
 - name: Configure strict umask in /etc/login.defs
   ansible.builtin.lineinfile:
     path: /etc/login.defs
-    regexp: '^\s*#?\s*UMASK\s+'
-    line: 'UMASK\t\t027'
+    regexp: '^#?\s*UMASK\s+[0-9]+'
+    line: 'UMASK 027'
     state: present
 
 - name: Ensure /etc/modprobe.d exists
@@ -114,3 +114,4 @@
     group: root
     mode: '0644'
   notify: Apply sysctl configuration
+
