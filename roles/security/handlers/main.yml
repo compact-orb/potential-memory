@@ -5,4 +5,3 @@
 - name: Reload systemd manager
   ansible.builtin.systemd:
     daemon_reload: true
-
