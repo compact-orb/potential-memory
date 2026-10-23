@@ -1,0 +1,24 @@
+---
+- name: Copy ansible-pull service to /etc/systemd/system
+  ansible.builtin.copy:
+    src: ansible-pull.service
+    dest: /etc/systemd/system/ansible-pull.service
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Reload systemd manager
+
+- name: Copy ansible-pull timer to /etc/systemd/system
+  ansible.builtin.copy:
+    src: ansible-pull.timer
+    dest: /etc/systemd/system/ansible-pull.timer
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Reload systemd manager
+
+- name: Enable and start ansible-pull timer
+  ansible.builtin.systemd:
+    name: ansible-pull.timer
+    enabled: true
+    state: started

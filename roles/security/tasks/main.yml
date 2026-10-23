@@ -98,6 +98,22 @@
     group: root
     mode: '0644'
 
+- name: Ensure /etc/sudoers.d exists
+  ansible.builtin.file:
+    path: /etc/sudoers.d
+    state: directory
+    owner: root
+    group: root
+    mode: '0750'
+
+- name: Configure sudo privileges for wheel group
+  ansible.builtin.copy:
+    content: "%wheel ALL=(ALL:ALL) ALL\n"
+    dest: /etc/sudoers.d/wheel
+    owner: root
+    group: root
+    mode: '0440'
+
 - name: Ensure /etc/sysctl.d exists
   ansible.builtin.file:
     path: /etc/sysctl.d

@@ -1,0 +1,23 @@
+[Unit]
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+ExecStart=/usr/bin/ansible-pull --url=https://github.com/compact-orb/potential-memory.git
+LockPersonality=yes
+MemoryDenyWriteExecute=yes
+NoNewPrivileges=yes
+PrivateDevices=yes
+PrivateTmp=yes
+ProtectClock=yes
+ProtectControlGroups=yes
+ProtectHostname=yes
+ProtectKernelLogs=yes
+ProtectKernelModules=yes
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+RestrictRealtime=yes
+RestrictSUIDSGID=yes
+SuccessExitStatus=0
+SystemCallArchitectures=native
+Type=oneshot
+UMask=0027
