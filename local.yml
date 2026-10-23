@@ -1,0 +1,69 @@
+---
+- name: Configuration
+  hosts: localhost
+  connection: local
+  become: true
+
+  vars_files:
+    - vars/main.yml
+
+  tasks:
+    - name: Copy update-bootloader.sh to /usr/local/bin
+      ansible.builtin.copy:
+        src: bin/update-bootloader.sh
+        dest: /usr/local/bin/update-bootloader.sh
+        mode: '0755'
+
+    - name: Copy update-bootloader.service to /etc/systemd/system
+      ansible.builtin.copy:
+        src: systemd/update-bootloader.service
+        dest: /etc/systemd/system/update-bootloader.service
+        mode: '0644'
+
+    - name: Copy update-bootloader.path to /etc/systemd/system
+      ansible.builtin.copy:
+        src: systemd/update-bootloader.path
+        dest: /etc/systemd/system/update-bootloader.path
+        mode: '0644'
+
+    - name: Mask systemd-boot-update.service
+      systemd:
+        name: systemd-boot-update.service
+        masked: true
+        state: stopped
+
+    - name: Enable update-bootloader.path
+      systemd:
+        name: update-bootloader.path
+        enabled: true
+
+    - name: Create systemd-resolved resolv.conf symlink
+      file:
+        src: /run/systemd/resolve/resolv.conf
+        dest: /etc/resolv.conf
+        state: link
+        force: true
+
+    - name: Disable systemd-networkd.service
+      systemd:
+        name: systemd-networkd.service
+        enabled: false
+        state: stopped
+
+    - name: Disable systemd-networkd-wait-online.service
+      systemd:
+        name: systemd-networkd-wait-online.service
+        enabled: false
+        state: stopped
+
+    - name: Enable NetworkManager.service
+      systemd:
+        name: NetworkManager.service
+        enabled: true
+        state: started
+
+    - name: Enable NetworkManager-wait-online.service
+      systemd:
+        name: NetworkManager-wait-online.service
+        enabled: true
+        state: started

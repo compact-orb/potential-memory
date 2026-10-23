@@ -1,0 +1,6 @@
+[Unit]
+ConditionPathExists=/boot/EFI/BOOT
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/update-bootloader.sh
