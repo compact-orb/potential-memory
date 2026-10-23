@@ -1,0 +1,109 @@
+---
+# === Public Keys Management ===
+
+- name: Create /etc/portage/keys directory
+  ansible.builtin.file:
+    path: /etc/portage/keys
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: Install public keys
+  ansible.builtin.copy:
+    src: "{{ item }}"
+    dest: "/etc/portage/keys/{{ item }}"
+    owner: root
+    group: root
+    mode: '0644'
+  loop:
+    - binpkg.asc
+    - automatic-journey-repo.asc
+    - github.asc
+
+# === GnuPG Binpkg Verification via getuto ===
+
+- name: Initialize /etc/portage/gnupg with getuto
+  ansible.builtin.command:
+    cmd: getuto
+  args:
+    creates: /etc/portage/gnupg/trustdb.gpg
+
+- name: Import binpkg key into Portage keyring
+  ansible.builtin.command:
+    cmd: gpg --batch --homedir /etc/portage/gnupg --import /etc/portage/keys/binpkg.asc
+  register: gpg_import
+  changed_when: "'imported: 1' in gpg_import.stderr"
+
+- name: Set ultimate trust for binpkg key
+  ansible.builtin.shell: |
+    fpr=$(gpg --batch --homedir /etc/portage/gnupg --with-colons --show-keys /etc/portage/keys/binpkg.asc | awk -F: '/^fpr/ {print $10; exit}')
+    echo "${fpr}:6:" | gpg --batch --homedir /etc/portage/gnupg --import-ownertrust
+  changed_when: false
+
+# === Ebuild Repositories (repos.conf) ===
+
+- name: Create /etc/portage/repos.conf directory
+  ansible.builtin.file:
+    path: /etc/portage/repos.conf
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: Configure gentoo ebuild repository
+  ansible.builtin.copy:
+    dest: /etc/portage/repos.conf/gentoo.conf
+    content: |
+      [gentoo]
+      location = /var/db/repos/gentoo
+      sync-type = git
+      sync-uri = https://github.com/gentoo-mirror/gentoo.git
+      sync-git-verify-commit-signature = yes
+      sync-openpgp-key-path = /usr/share/openpgp-keys/gentoo-release.asc
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Configure automatic-journey ebuild repository
+  ansible.builtin.copy:
+    dest: /etc/portage/repos.conf/automatic-journey.conf
+    content: |
+      [automatic-journey]
+      location = /var/db/repos/automatic-journey
+      sync-type = git
+      sync-uri = https://github.com/compact-orb/automatic-journey.git
+      sync-git-verify-commit-signature = yes
+      sync-openpgp-key-path = /etc/portage/keys/automatic-journey-repo.asc
+    owner: root
+    group: root
+    mode: '0644'
+
+# === Binary Package Repositories (binrepos.conf) ===
+
+- name: Detect active Portage profile
+  ansible.builtin.stat:
+    path: /etc/portage/make.profile
+  register: profile_stat
+
+- name: Extract relative profile path
+  ansible.builtin.set_fact:
+    active_profile: "{{ (profile_stat.stat.lnk_target | regex_replace('^.*/profiles/', '')) if (profile_stat.stat.exists and profile_stat.stat.islnk) else default_profile }}"
+
+- name: Create /etc/portage/binrepos.conf directory
+  ansible.builtin.file:
+    path: /etc/portage/binrepos.conf
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: Configure automatic-journey binary package repository
+  ansible.builtin.copy:
+    dest: /etc/portage/binrepos.conf/automatic-journey.conf
+    content: |
+      [automatic-journey]
+      sync-uri = {{ binpkg_base_url }}/{{ active_profile }}
+    owner: root
+    group: root
+    mode: '0644'

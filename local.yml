@@ -10,3 +10,4 @@
   roles:
     - bootloader
     - network
+    - portage
