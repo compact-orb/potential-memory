@@ -6,15 +6,13 @@
     state: link
     force: true
 
-- name: Disable and mask systemd-networkd services
+- name: Disable systemd-networkd services
   ansible.builtin.systemd_service:
     name: "{{ item }}"
     enabled: false
-    masked: true
   loop:
     - systemd-networkd.service
     - systemd-networkd-wait-online.service
-    - systemd-network-generator.service
 
 - name: Enable NetworkManager services
   ansible.builtin.systemd_service:
