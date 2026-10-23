@@ -30,4 +30,4 @@
 - name: Run update-bootloader initial synchronization
   ansible.builtin.command:
     cmd: /usr/local/bin/update-bootloader.sh
-  changed_when: true
+    creates: /boot/EFI/BOOT/BOOTX64.EFI
