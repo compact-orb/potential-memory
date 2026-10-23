@@ -86,19 +86,30 @@
 
 # === Binary Package Repositories (binrepos.conf) ===
 
-- name: Detect active Portage profile
+- name: Detect active Portage profile symlink
   ansible.builtin.stat:
     path: /etc/portage/make.profile
     follow: false
   register: profile_stat
 
-- name: Extract relative profile path
+- name: Fail if /etc/portage/make.profile is not a valid profile symlink
+  ansible.builtin.fail:
+    msg: >-
+      /etc/portage/make.profile is not a valid profile symlink.
+      Cannot detect binpkg repository.
+  when: >-
+    not (profile_stat.stat.islnk is defined and
+         profile_stat.stat.islnk and
+         '/profiles/' in profile_stat.stat.lnk_target)
+
+- name: Extract detected repository and profile path
   ansible.builtin.set_fact:
-    active_profile: >-
-      {{ (profile_stat.stat.lnk_target |
-          regex_replace('^.*/profiles/', ''))
-         if (profile_stat.stat.islnk is defined and profile_stat.stat.islnk)
-         else default_profile }}
+    detected_repo: >-
+      {{ profile_stat.stat.lnk_target |
+         regex_replace('^.*repos/([^/]+)/profiles.*$', '\\1') }}
+    detected_profile: >-
+      {{ profile_stat.stat.lnk_target |
+         regex_replace('^.*/profiles/', '') }}
 
 - name: Create /etc/portage/binrepos.conf directory
   ansible.builtin.file:
@@ -108,12 +119,13 @@
     group: root
     mode: '0755'
 
-- name: Configure automatic-journey binary package repository
+- name: Configure binary package repository for detected repository
   ansible.builtin.copy:
-    dest: /etc/portage/binrepos.conf/automatic-journey.conf
+    dest: "/etc/portage/binrepos.conf/{{ detected_repo }}.conf"
     content: |
-      [automatic-journey]
-      sync-uri = {{ binpkg_base_url }}/{{ active_profile }}
+      [{{ detected_repo }}]
+      sync-uri = {{ binpkg_repositories[detected_repo] }}/{{ detected_profile }}
     owner: root
     group: root
     mode: '0644'
+  when: detected_repo in binpkg_repositories

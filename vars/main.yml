@@ -1,3 +1,4 @@
 ---
-binpkg_base_url: "https://lively-flower-f91a.compact-orb.workers.dev/binpkgs"
-default_profile: "amd64/llvm-libstdc++-hardened-systemd-optimize-x86-64-v3"
+binpkg_repositories:
+  automatic-journey: >-
+    https://lively-flower-f91a.compact-orb.workers.dev/binpkgs
