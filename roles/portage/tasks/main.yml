@@ -84,11 +84,12 @@
 - name: Detect active Portage profile
   ansible.builtin.stat:
     path: /etc/portage/make.profile
+    follow: false
   register: profile_stat
 
 - name: Extract relative profile path
   ansible.builtin.set_fact:
-    active_profile: "{{ (profile_stat.stat.lnk_target | regex_replace('^.*/profiles/', '')) if (profile_stat.stat.exists and profile_stat.stat.islnk) else default_profile }}"
+    active_profile: "{{ (profile_stat.stat.lnk_target | regex_replace('^.*/profiles/', '')) if (profile_stat.stat.islnk is defined and profile_stat.stat.islnk) else default_profile }}"
 
 - name: Create /etc/portage/binrepos.conf directory
   ansible.builtin.file:
