@@ -44,6 +44,8 @@
       awk --field-separator=":" '/^fpr/ {print $10; exit}')
     printf "%s\n" "${fpr}:6:" | \
       gpg --batch --homedir /etc/portage/gnupg --import-ownertrust
+    gpg --batch --homedir /etc/portage/gnupg --check-trustdb
+    chmod ugo+r /etc/portage/gnupg/trustdb.gpg
   changed_when: false
 
 # === Ebuild Repositories ===
@@ -80,6 +82,7 @@
       sync-uri = https://github.com/compact-orb/automatic-journey.git
       sync-git-verify-commit-signature = yes
       sync-openpgp-key-path = /etc/portage/keys/automatic-journey-repo.asc
+      sync-openpgp-key-refresh = false-nowarn
     owner: root
     group: root
     mode: '0644'
