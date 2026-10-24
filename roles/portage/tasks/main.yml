@@ -92,15 +92,16 @@
     follow: false
   register: profile_stat
 
-- name: Fail if /etc/portage/make.profile is not a valid profile symlink
-  ansible.builtin.fail:
-    msg: >-
+- name: Verify /etc/portage/make.profile is a valid profile symlink
+  ansible.builtin.assert:
+    that:
+      - profile_stat.stat.islnk is defined
+      - profile_stat.stat.islnk
+      - "'/profiles/' in profile_stat.stat.lnk_target"
+    fail_msg: >-
       /etc/portage/make.profile is not a valid profile symlink.
       Cannot detect binpkg repository.
-  when: >-
-    not (profile_stat.stat.islnk is defined and
-         profile_stat.stat.islnk and
-         '/profiles/' in profile_stat.stat.lnk_target)
+    quiet: true
 
 - name: Extract detected repository and profile path
   ansible.builtin.set_fact:
