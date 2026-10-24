@@ -50,6 +50,14 @@
 
 # === Ebuild Repositories ===
 
+- name: Ensure /var/db/repos directory exists with portage ownership
+  ansible.builtin.file:
+    path: /var/db/repos
+    state: directory
+    owner: portage
+    group: portage
+    mode: '0755'
+
 - name: Create /etc/portage/repos.conf directory
   ansible.builtin.file:
     path: /etc/portage/repos.conf
