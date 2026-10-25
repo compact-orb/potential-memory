@@ -1,0 +1,5 @@
+---
+- name: Reload apparmor profiles
+  ansible.builtin.command:
+    cmd: /usr/share/apparmor/apparmor_load.sh
+  changed_when: true

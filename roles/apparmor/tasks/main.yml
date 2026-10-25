@@ -1,0 +1,74 @@
+---
+- name: Ensure /var/cache/apparmor exists with restricted permissions
+  ansible.builtin.file:
+    path: /var/cache/apparmor
+    state: directory
+    owner: root
+    group: root
+    mode: '0700'
+
+- name: Ensure /etc/apparmor directory exists
+  ansible.builtin.file:
+    path: /etc/apparmor
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: Deploy /etc/apparmor/parser.conf configuration
+  ansible.builtin.copy:
+    src: parser.conf
+    dest: /etc/apparmor/parser.conf
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Reload apparmor profiles
+
+- name: Ensure /etc/apparmor.d/local directory exists
+  ansible.builtin.file:
+    path: /etc/apparmor.d/local
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: Ensure /etc/apparmor.d/abstractions/authentication.d directory exists
+  ansible.builtin.file:
+    path: /etc/apparmor.d/abstractions/authentication.d
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: Deploy PAM abstraction vendor override
+  ansible.builtin.copy:
+    src: abstractions/gentoo.conf
+    dest: /etc/apparmor.d/abstractions/authentication.d/gentoo.conf
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Reload apparmor profiles
+
+- name: Deploy local systemd-userwork drop-in
+  ansible.builtin.copy:
+    src: local/systemd-userwork
+    dest: /etc/apparmor.d/local/systemd-userwork
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Reload apparmor profiles
+
+- name: Deploy local unix-chkpwd drop-in
+  ansible.builtin.copy:
+    src: local/unix-chkpwd
+    dest: /etc/apparmor.d/local/unix-chkpwd
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Reload apparmor profiles
+
+- name: Ensure apparmor.service is enabled and running
+  ansible.builtin.systemd_service:
+    name: apparmor.service
+    enabled: true
+    state: started

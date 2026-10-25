@@ -13,3 +13,4 @@
     - network
     - portage
     - security
+    - apparmor

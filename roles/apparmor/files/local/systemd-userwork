@@ -1,0 +1,3 @@
+# Local drop-in for systemd-userwork
+# Allow UserDB to read /etc/login.defs for account metadata lookups
+@{etc_ro}/login.defs r,
