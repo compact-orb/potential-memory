@@ -1,0 +1,3 @@
+# Local drop-in for apparmor_parser
+# Allow apparmor_parser execution path on Gentoo (/usr/bin/apparmor_parser)
+/{,usr/}{bin,sbin}/apparmor_parser mr,

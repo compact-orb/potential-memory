@@ -1,4 +1,9 @@
 ---
+- name: Reinstall and reload apparmor profiles
+  ansible.builtin.command:
+    cmd: aa-install -i
+  changed_when: true
+
 - name: Reload apparmor profiles
   ansible.builtin.command:
     cmd: /usr/share/apparmor/apparmor_load.sh

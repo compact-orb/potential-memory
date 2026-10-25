@@ -1,0 +1,3 @@
+# Local drop-in for aa-mode
+# Allow aa-mode to transition to apparmor_parser on Gentoo (/usr/bin)
+@{bin}/apparmor_parser Px -> apparmor_parser,

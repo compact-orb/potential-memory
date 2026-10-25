@@ -1,0 +1,3 @@
+# Local drop-in for systemd-user-runtime-dir
+# Allow reading /etc/login.defs for user session configuration
+@{etc_ro}/login.defs r,

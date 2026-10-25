@@ -7,13 +7,39 @@
     group: root
     mode: '0700'
 
-- name: Ensure /etc/apparmor directory exists
+- name: Ensure /etc/apparmor directories exist
   ansible.builtin.file:
-    path: /etc/apparmor
+    path: "{{ item }}"
     state: directory
     owner: root
     group: root
     mode: '0755'
+  loop:
+    - /etc/apparmor
+    - /etc/apparmor/flags.d
+    - /etc/apparmor.d/local
+    - /etc/apparmor.d/abstractions/authentication.d
+
+- name: Deploy /etc/apparmor/modes configuration
+  ansible.builtin.copy:
+    src: modes
+    dest: /etc/apparmor/modes
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Reinstall and reload apparmor profiles
+
+- name: Mask vendor flags to default all profiles to enforce mode
+  ansible.builtin.copy:
+    src: "flags.d/{{ item }}"
+    dest: "/etc/apparmor/flags.d/{{ item }}"
+    owner: root
+    group: root
+    mode: '0644'
+  loop:
+    - 00-main.conf
+    - 10-debian.conf
+  notify: Reinstall and reload apparmor profiles
 
 - name: Deploy /etc/apparmor/parser.conf configuration
   ansible.builtin.copy:
@@ -24,22 +50,6 @@
     mode: '0644'
   notify: Reload apparmor profiles
 
-- name: Ensure /etc/apparmor.d/local directory exists
-  ansible.builtin.file:
-    path: /etc/apparmor.d/local
-    state: directory
-    owner: root
-    group: root
-    mode: '0755'
-
-- name: Ensure /etc/apparmor.d/abstractions/authentication.d directory exists
-  ansible.builtin.file:
-    path: /etc/apparmor.d/abstractions/authentication.d
-    state: directory
-    owner: root
-    group: root
-    mode: '0755'
-
 - name: Deploy PAM abstraction vendor override
   ansible.builtin.copy:
     src: abstractions/gentoo.conf
@@ -49,23 +59,34 @@
     mode: '0644'
   notify: Reload apparmor profiles
 
-- name: Deploy local systemd-userwork drop-in
+- name: Deploy local profile drop-ins
   ansible.builtin.copy:
-    src: local/systemd-userwork
-    dest: /etc/apparmor.d/local/systemd-userwork
+    src: "local/{{ item }}"
+    dest: "/etc/apparmor.d/local/{{ item }}"
     owner: root
     group: root
     mode: '0644'
+  loop:
+    - aa-install
+    - aa-mode
+    - apparmor_parser
+    - systemd-nsresourcework
+    - systemd-user-runtime-dir
+    - systemd-userwork
+    - unix-chkpwd
   notify: Reload apparmor profiles
 
-- name: Deploy local unix-chkpwd drop-in
-  ansible.builtin.copy:
-    src: local/unix-chkpwd
-    dest: /etc/apparmor.d/local/unix-chkpwd
-    owner: root
-    group: root
-    mode: '0644'
-  notify: Reload apparmor profiles
+- name: Ensure auditd.service is enabled and running
+  ansible.builtin.systemd_service:
+    name: auditd.service
+    enabled: true
+    state: started
+
+- name: Ensure apparmor.d profiles are installed
+  ansible.builtin.command:
+    cmd: aa-install -i
+  args:
+    creates: /etc/apparmor/install.db
 
 - name: Ensure apparmor.service is enabled and running
   ansible.builtin.systemd_service:

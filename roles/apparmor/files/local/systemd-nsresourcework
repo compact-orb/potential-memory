@@ -1,0 +1,3 @@
+# Local drop-in for systemd-nsresourcework
+# Allow worker to signal unconfined parent/supervisor with SIGUSR2
+signal send set=usr2 peer=unconfined,
