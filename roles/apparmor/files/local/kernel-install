@@ -1,0 +1,3 @@
+  # Allow following kernel symlink to /usr/src
+  /usr/src/linux-*/** r,
+  /usr/lib/modules/** r,

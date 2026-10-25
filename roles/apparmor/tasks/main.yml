@@ -70,10 +70,13 @@
     - aa-install
     - aa-mode
     - apparmor_parser
+    - kernel-install
+    - login
     - systemd-nsresourcework
     - systemd-user-runtime-dir
     - systemd-userwork
     - unix-chkpwd
+    - userdbctl
   notify: Reload apparmor profiles
 
 - name: Ensure auditd.service is enabled and running
