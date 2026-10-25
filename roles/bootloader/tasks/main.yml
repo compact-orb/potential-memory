@@ -39,22 +39,3 @@
   ansible.builtin.command:
     cmd: /usr/local/bin/update-bootloader.sh
     creates: /boot/EFI/BOOT/grubx64.efi
-
-- name: Ensure correct LSM ordering in /etc/kernel/cmdline
-  ansible.builtin.replace:
-    path: /etc/kernel/cmdline
-    regexp: 'lsm=\S+'
-    replace: 'lsm=landlock,yama,apparmor,bpf'
-
-- name: Find boot loader entries
-  ansible.builtin.find:
-    paths: /boot/loader/entries
-    patterns: '*.conf'
-  register: boot_loader_entries
-
-- name: Ensure correct LSM ordering in boot loader entries
-  ansible.builtin.replace:
-    path: "{{ item.path }}"
-    regexp: 'lsm=\S+'
-    replace: 'lsm=landlock,yama,apparmor,bpf'
-  loop: "{{ boot_loader_entries.files }}"
