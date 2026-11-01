@@ -87,7 +87,7 @@
 
 - name: Ensure apparmor.d profiles are installed
   ansible.builtin.command:
-    cmd: aa-install -i
+    cmd: "aa-install -i{{ ' --no-reload' if not systemd_is_booted else '' }}"
   args:
     creates: /etc/apparmor/install.db
 
