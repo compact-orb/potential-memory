@@ -6,10 +6,11 @@
     state: link
     force: true
 
-- name: Disable systemd-networkd services
+- name: Disable and stop systemd-networkd services
   ansible.builtin.systemd_service:
     name: "{{ item }}"
     enabled: false
+    state: "{{ 'stopped' if systemd_is_booted else omit }}"
   loop:
     - systemd-networkd.service
     - systemd-networkd-wait-online.service
@@ -21,3 +22,8 @@
   loop:
     - NetworkManager.service
     - NetworkManager-wait-online.service
+
+- name: Ensure NetworkManager is started
+  ansible.builtin.systemd_service:
+    name: NetworkManager.service
+    state: "{{ 'started' if systemd_is_booted else omit }}"

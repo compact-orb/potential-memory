@@ -34,6 +34,7 @@
   ansible.builtin.systemd_service:
     name: update-bootloader.path
     enabled: true
+    state: "{{ 'started' if systemd_is_booted else omit }}"
 
 - name: Run update-bootloader initial synchronization
   ansible.builtin.command:
