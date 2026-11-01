@@ -79,11 +79,10 @@
     - userdbctl
   notify: Reload apparmor profiles
 
-- name: Ensure auditd.service is enabled and running
+- name: Ensure auditd.service is enabled
   ansible.builtin.systemd_service:
     name: auditd.service
     enabled: true
-    state: started
 
 - name: Ensure apparmor.d profiles are installed
   ansible.builtin.command:
@@ -91,8 +90,7 @@
   args:
     creates: /etc/apparmor/install.db
 
-- name: Ensure apparmor.service is enabled and running
+- name: Ensure apparmor.service is enabled
   ansible.builtin.systemd_service:
     name: apparmor.service
     enabled: true
-    state: started

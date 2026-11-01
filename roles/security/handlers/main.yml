@@ -1,7 +1,9 @@
 ---
 - name: Apply sysctl configuration
-  ansible.builtin.command: /usr/lib/systemd/systemd-sysctl /etc/sysctl.d/99-security.conf
+  ansible.builtin.command:
+    cmd: /usr/lib/systemd/systemd-sysctl /etc/sysctl.d/99-security.conf
 
 - name: Reload systemd manager
-  ansible.builtin.systemd:
+  ansible.builtin.systemd_service:
     daemon_reload: true
+  failed_when: false
