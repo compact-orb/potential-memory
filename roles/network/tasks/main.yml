@@ -27,3 +27,23 @@
   ansible.builtin.systemd_service:
     name: NetworkManager.service
     state: "{{ 'started' if systemd_is_booted else omit }}"
+
+- name: Enable systemd-resolved service
+  ansible.builtin.systemd_service:
+    name: systemd-resolved.service
+    enabled: true
+
+- name: Ensure systemd-resolved is started
+  ansible.builtin.systemd_service:
+    name: systemd-resolved.service
+    state: "{{ 'started' if systemd_is_booted else omit }}"
+
+- name: Enable sshd service
+  ansible.builtin.systemd_service:
+    name: sshd.service
+    enabled: true
+
+- name: Ensure sshd is started
+  ansible.builtin.systemd_service:
+    name: sshd.service
+    state: "{{ 'started' if systemd_is_booted else omit }}"
