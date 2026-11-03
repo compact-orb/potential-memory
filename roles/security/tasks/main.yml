@@ -108,7 +108,7 @@
 
 - name: Configure sudo privileges for wheel group
   ansible.builtin.copy:
-    content: "%wheel ALL=(ALL:ALL) NOPASSWD: ALL\n"
+    content: "%wheel ALL=(ALL:ALL) ALL\n"
     dest: /etc/sudoers.d/wheel
     owner: root
     group: root
