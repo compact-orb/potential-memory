@@ -1,12 +1,4 @@
 ---
-- name: Ensure /usr/local/bin exists
-  ansible.builtin.file:
-    path: /usr/local/bin
-    state: directory
-    owner: root
-    group: root
-    mode: '0755'
-
 - name: Copy update-bootloader.sh to /usr/local/bin
   ansible.builtin.copy:
     src: update-bootloader.sh
@@ -18,12 +10,14 @@
     src: update-bootloader.service
     dest: /etc/systemd/system/update-bootloader.service
     mode: '0644'
+  notify: Reload systemd manager
 
 - name: Copy update-bootloader.path to /etc/systemd/system
   ansible.builtin.copy:
     src: update-bootloader.path
     dest: /etc/systemd/system/update-bootloader.path
     mode: '0644'
+  notify: Reload systemd manager
 
 - name: Mask systemd-boot-update.service
   ansible.builtin.systemd_service:
@@ -39,4 +33,4 @@
 - name: Run update-bootloader initial synchronization
   ansible.builtin.command:
     cmd: /usr/local/bin/update-bootloader.sh
-    creates: /boot/EFI/BOOT/grubx64.efi
+    creates: /boot/EFI/BOOT/BOOTX64.EFI

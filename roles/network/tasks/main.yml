@@ -15,35 +15,17 @@
     - systemd-networkd.service
     - systemd-networkd-wait-online.service
 
-- name: Enable NetworkManager services
+- name: Enable NetworkManager-wait-online service
+  ansible.builtin.systemd_service:
+    name: NetworkManager-wait-online.service
+    enabled: true
+
+- name: Enable and start network and SSH services
   ansible.builtin.systemd_service:
     name: "{{ item }}"
     enabled: true
+    state: "{{ 'started' if systemd_is_booted else omit }}"
   loop:
     - NetworkManager.service
-    - NetworkManager-wait-online.service
-
-- name: Ensure NetworkManager is started
-  ansible.builtin.systemd_service:
-    name: NetworkManager.service
-    state: "{{ 'started' if systemd_is_booted else omit }}"
-
-- name: Enable systemd-resolved service
-  ansible.builtin.systemd_service:
-    name: systemd-resolved.service
-    enabled: true
-
-- name: Ensure systemd-resolved is started
-  ansible.builtin.systemd_service:
-    name: systemd-resolved.service
-    state: "{{ 'started' if systemd_is_booted else omit }}"
-
-- name: Enable sshd service
-  ansible.builtin.systemd_service:
-    name: sshd.service
-    enabled: true
-
-- name: Ensure sshd is started
-  ansible.builtin.systemd_service:
-    name: sshd.service
-    state: "{{ 'started' if systemd_is_booted else omit }}"
+    - systemd-resolved.service
+    - sshd.service
