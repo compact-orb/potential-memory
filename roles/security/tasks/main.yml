@@ -1,4 +1,12 @@
 ---
+- name: Ensure /etc/security/limits.d exists
+  ansible.builtin.file:
+    path: /etc/security/limits.d
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+
 - name: Disable core dumps via security limits
   ansible.builtin.copy:
     src: disable-coredump-limits.conf
@@ -7,6 +15,14 @@
     group: root
     mode: '0644'
 
+- name: Ensure /etc/systemd/coredump.conf.d exists
+  ansible.builtin.file:
+    path: /etc/systemd/coredump.conf.d
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+
 - name: Disable systemd-coredump storage
   ansible.builtin.copy:
     src: disable-coredump-systemd.conf
@@ -14,6 +30,14 @@
     owner: root
     group: root
     mode: '0644'
+
+- name: Ensure /etc/systemd/system.conf.d exists
+  ansible.builtin.file:
+    path: /etc/systemd/system.conf.d
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
 
 - name: Disable systemd default core limit
   ansible.builtin.copy:
@@ -58,6 +82,14 @@
     line: 'UMASK 027'
     state: present
 
+- name: Ensure /etc/modprobe.d exists
+  ansible.builtin.file:
+    path: /etc/modprobe.d
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+
 - name: Deploy module blacklist configuration
   ansible.builtin.copy:
     src: security-blacklist.conf
@@ -81,6 +113,14 @@
     owner: root
     group: root
     mode: '0440'
+
+- name: Ensure /etc/sysctl.d exists
+  ansible.builtin.file:
+    path: /etc/sysctl.d
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
 
 - name: Deploy sysctl hardening configuration
   ansible.builtin.copy:

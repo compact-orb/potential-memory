@@ -29,6 +29,7 @@ RestrictRealtime=yes
 RestrictSUIDSGID=yes
 SystemCallArchitectures=native
 SystemCallFilter=@system-service
-SystemCallFilter=~@clock @cpu-emulation @debug @mount @obsolete @privileged @raw-io @reboot @resources @swap
+SystemCallFilter=~@clock @cpu-emulation @debug @mount @obsolete @privileged \
+    @raw-io @reboot @resources @swap
 Type=oneshot
 UMask=0077

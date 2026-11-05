@@ -1,7 +1,8 @@
 ---
 - name: Reinstall and reload apparmor profiles
   ansible.builtin.command:
-    cmd: "aa-install -i{{ ' --no-reload' if not systemd_is_booted else '' }}"
+    cmd: >-
+      aa-install --install{{ ' --no-reload' if not systemd_is_booted else '' }}
   environment:
     DISTRIBUTION: arch
   changed_when: true

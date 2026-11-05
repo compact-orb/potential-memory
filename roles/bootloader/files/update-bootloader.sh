@@ -17,9 +17,10 @@ if [[ -f "/usr/share/shim/BOOTX64.EFI" ]]; then
     if [[ -f "/usr/share/shim/mmx64.efi" ]]; then
         cp --force "/usr/share/shim/mmx64.efi" "${esp_boot_dir}/mmx64.efi"
     fi
-    if [[ -n "${systemd_boot_efi}" ]]; then
-        cp --force "${systemd_boot_efi}" "${esp_boot_dir}/grubx64.efi"
-    fi
 elif [[ -n "${systemd_boot_efi}" ]]; then
     cp --force "${systemd_boot_efi}" "${esp_boot_dir}/BOOTX64.EFI"
+fi
+
+if [[ -n "${systemd_boot_efi}" ]]; then
+    cp --force "${systemd_boot_efi}" "${esp_boot_dir}/grubx64.efi"
 fi

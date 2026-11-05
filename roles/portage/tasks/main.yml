@@ -1,6 +1,14 @@
 ---
 # === Public Keys Management ===
 
+- name: Create /etc/portage/keys directory
+  ansible.builtin.file:
+    path: /etc/portage/keys
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+
 - name: Install public keys
   ansible.builtin.copy:
     src: "{{ item }}"
@@ -32,11 +40,12 @@
   ansible.builtin.shell: |
     fpr=$(gpg --batch --homedir /etc/portage/gnupg \
       --with-colons --show-keys /etc/portage/keys/binpkg.asc | \
-      awk --field-separator=":" '/^fpr/ {print $10; exit}')
+      awk -F: '/^fpr/ {print $10; exit}')
     printf "%s\n" "${fpr}:6:" | \
       gpg --batch --homedir /etc/portage/gnupg --import-ownertrust
     gpg --batch --homedir /etc/portage/gnupg --check-trustdb
     chmod ugo+r /etc/portage/gnupg/trustdb.gpg
+    gpgconf --homedir /etc/portage/gnupg --kill all 2> /dev/null || true
   when: gpg_import.changed
 
 # === Ebuild Repositories ===
@@ -47,6 +56,14 @@
     state: directory
     owner: portage
     group: portage
+    mode: '0755'
+
+- name: Create /etc/portage/repos.conf directory
+  ansible.builtin.file:
+    path: /etc/portage/repos.conf
+    state: directory
+    owner: root
+    group: root
     mode: '0755'
 
 - name: Configure gentoo ebuild repository
@@ -103,6 +120,14 @@
       {{ profile_stat.stat.lnk_target.split('/profiles/')[0].split('/')[-1] }}
     detected_profile: >-
       {{ profile_stat.stat.lnk_target.split('/profiles/')[1] }}
+
+- name: Create /etc/portage/binrepos.conf directory
+  ansible.builtin.file:
+    path: /etc/portage/binrepos.conf
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
 
 - name: Configure binary package repository for detected repository
   ansible.builtin.copy:

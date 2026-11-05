@@ -7,6 +7,19 @@
     group: root
     mode: '0700'
 
+- name: Ensure /etc/apparmor directories exist
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+  loop:
+    - /etc/apparmor
+    - /etc/apparmor/flags.d
+    - /etc/apparmor.d/local
+    - /etc/apparmor.d/abstractions/authentication.d
+
 - name: Deploy /etc/apparmor/modes configuration
   ansible.builtin.copy:
     src: modes
@@ -60,7 +73,8 @@
 
 - name: Ensure apparmor.d profiles are installed
   ansible.builtin.command:
-    cmd: "aa-install -i{{ ' --no-reload' if not systemd_is_booted else '' }}"
+    cmd: >-
+      aa-install --install{{ ' --no-reload' if not systemd_is_booted else '' }}
   environment:
     DISTRIBUTION: arch
   args:
