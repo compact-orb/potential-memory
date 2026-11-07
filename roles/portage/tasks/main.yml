@@ -95,6 +95,18 @@
     group: root
     mode: '0644'
 
+- name: Configure guru ebuild repository
+  ansible.builtin.copy:
+    dest: /etc/portage/repos.conf/guru.conf
+    content: |
+      [guru]
+      location = /var/db/repos/guru
+      sync-type = git
+      sync-uri = https://github.com/gentoo/guru.git
+    owner: root
+    group: root
+    mode: '0644'
+
 # === Binary Package Repositories ===
 
 - name: Detect active Portage profile symlink
