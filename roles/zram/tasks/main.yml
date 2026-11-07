@@ -1,0 +1,17 @@
+---
+- name: Ensure /etc/systemd/zram-generator.conf.d exists
+  ansible.builtin.file:
+    path: /etc/systemd/zram-generator.conf.d
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: Deploy zram-generator configuration
+  ansible.builtin.copy:
+    src: zram.conf
+    dest: /etc/systemd/zram-generator.conf.d/zram.conf
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Reload systemd manager

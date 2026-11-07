@@ -29,3 +29,20 @@
     - NetworkManager.service
     - systemd-resolved.service
     - sshd.service
+
+- name: Ensure /etc/sysctl.d exists
+  ansible.builtin.file:
+    path: /etc/sysctl.d
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: Deploy FQ and BBR sysctl configuration
+  ansible.builtin.copy:
+    src: 50-bbr.conf
+    dest: /etc/sysctl.d/50-bbr.conf
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Apply network sysctl configuration

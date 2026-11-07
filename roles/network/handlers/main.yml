@@ -1,0 +1,5 @@
+---
+- name: Apply network sysctl configuration
+  ansible.builtin.command:
+    cmd: /usr/lib/systemd/systemd-sysctl /etc/sysctl.d/50-bbr.conf
+  when: systemd_is_booted
