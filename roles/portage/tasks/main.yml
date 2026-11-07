@@ -107,6 +107,18 @@
     group: root
     mode: '0644'
 
+- name: Configure steam-overlay ebuild repository
+  ansible.builtin.copy:
+    dest: /etc/portage/repos.conf/steam-overlay.conf
+    content: |
+      [steam-overlay]
+      location = /var/db/repos/steam-overlay
+      sync-type = git
+      sync-uri = https://github.com/anyc/steam-overlay.git
+    owner: root
+    group: root
+    mode: '0644'
+
 # === Binary Package Repositories ===
 
 - name: Detect active Portage profile symlink
