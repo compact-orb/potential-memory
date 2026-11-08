@@ -46,3 +46,20 @@
     group: root
     mode: '0644'
   notify: Apply network sysctl configuration
+
+- name: Ensure /etc/NetworkManager/conf.d exists
+  ansible.builtin.file:
+    path: /etc/NetworkManager/conf.d
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: Deploy NetworkManager unmanaged devices configuration
+  ansible.builtin.copy:
+    src: 10-unmanaged-vpn.conf
+    dest: /etc/NetworkManager/conf.d/10-unmanaged-vpn.conf
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Reload NetworkManager
