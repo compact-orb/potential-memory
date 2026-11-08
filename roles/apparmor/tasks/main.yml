@@ -1,0 +1,96 @@
+---
+- name: Ensure /var/cache/apparmor exists with restricted permissions
+  ansible.builtin.file:
+    path: /var/cache/apparmor
+    state: directory
+    owner: root
+    group: root
+    mode: '0700'
+
+- name: Ensure /etc/apparmor directories exist
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+  loop:
+    - /etc/apparmor
+    - /etc/apparmor/flags.d
+    - /etc/apparmor.d/local
+    - /etc/apparmor.d/abstractions/authentication.d
+
+- name: Deploy /etc/apparmor/modes configuration
+  ansible.builtin.copy:
+    src: modes
+    dest: /etc/apparmor/modes
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Reinstall and reload apparmor profiles
+
+- name: Mask vendor flags to default all profiles to enforce mode
+  ansible.builtin.copy:
+    src: flags.d/
+    dest: /etc/apparmor/flags.d/
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Reinstall and reload apparmor profiles
+
+- name: Deploy /etc/apparmor/parser.conf configuration
+  ansible.builtin.copy:
+    src: parser.conf
+    dest: /etc/apparmor/parser.conf
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Reload apparmor profiles
+
+- name: Deploy PAM abstraction vendor override
+  ansible.builtin.copy:
+    src: abstractions/gentoo.conf
+    dest: /etc/apparmor.d/abstractions/authentication.d/gentoo.conf
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Reload apparmor profiles
+
+- name: Deploy local profile drop-ins
+  ansible.builtin.copy:
+    src: local/
+    dest: /etc/apparmor.d/local/
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Reload apparmor profiles
+
+- name: Remove obsolete local profile drop-ins
+  ansible.builtin.file:
+    path: "/etc/apparmor.d/local/{{ item }}"
+    state: absent
+  loop:
+    - aa-install
+    - aa-mode
+  notify: Reload apparmor profiles
+
+- name: Ensure auditd.service is enabled and running
+  ansible.builtin.systemd_service:
+    name: auditd.service
+    enabled: true
+    state: "{{ 'started' if systemd_is_booted else omit }}"
+
+- name: Ensure apparmor.d profiles are installed
+  ansible.builtin.command:
+    cmd: >-
+      aa-install --install{{ ' --no-reload' if not systemd_is_booted else '' }}
+  environment:
+    DISTRIBUTION: arch
+  args:
+    creates: /etc/apparmor/install.db
+
+- name: Ensure apparmor.service is enabled and running
+  ansible.builtin.systemd_service:
+    name: apparmor.service
+    enabled: true
+    state: "{{ 'started' if systemd_is_booted else omit }}"

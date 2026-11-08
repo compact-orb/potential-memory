@@ -1,0 +1,65 @@
+---
+- name: Create systemd-resolved stub-resolv.conf symlink
+  ansible.builtin.file:
+    src: /run/systemd/resolve/stub-resolv.conf
+    dest: /etc/resolv.conf
+    state: link
+    force: true
+
+- name: Disable and stop systemd-networkd services
+  ansible.builtin.systemd_service:
+    name: "{{ item }}"
+    enabled: false
+    state: "{{ 'stopped' if systemd_is_booted else omit }}"
+  loop:
+    - systemd-networkd.service
+    - systemd-networkd-wait-online.service
+
+- name: Enable NetworkManager-wait-online service
+  ansible.builtin.systemd_service:
+    name: NetworkManager-wait-online.service
+    enabled: true
+
+- name: Enable and start network and SSH services
+  ansible.builtin.systemd_service:
+    name: "{{ item }}"
+    enabled: true
+    state: "{{ 'started' if systemd_is_booted else omit }}"
+  loop:
+    - NetworkManager.service
+    - systemd-resolved.service
+    - sshd.service
+
+- name: Ensure /etc/sysctl.d exists
+  ansible.builtin.file:
+    path: /etc/sysctl.d
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: Deploy FQ and BBR sysctl configuration
+  ansible.builtin.copy:
+    src: 50-bbr.conf
+    dest: /etc/sysctl.d/50-bbr.conf
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Apply network sysctl configuration
+
+- name: Ensure /etc/NetworkManager/conf.d exists
+  ansible.builtin.file:
+    path: /etc/NetworkManager/conf.d
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: Deploy NetworkManager unmanaged devices configuration
+  ansible.builtin.copy:
+    src: 10-unmanaged-vpn.conf
+    dest: /etc/NetworkManager/conf.d/10-unmanaged-vpn.conf
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Reload NetworkManager

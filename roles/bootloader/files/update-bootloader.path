@@ -1,0 +1,8 @@
+[Path]
+PathModified=/usr/share/shim/BOOTX64.EFI
+PathModified=/usr/lib/systemd/boot/efi/systemd-bootx64.efi
+PathModified=/usr/lib/systemd/boot/efi/systemd-bootx64.efi.signed
+Unit=update-bootloader.service
+
+[Install]
+WantedBy=multi-user.target
