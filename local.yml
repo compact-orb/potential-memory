@@ -30,3 +30,4 @@
     - security
     - apparmor
     - zram
+    - logind

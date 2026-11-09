@@ -1,0 +1,6 @@
+---
+- name: Reload systemd-logind
+  ansible.builtin.systemd_service:
+    name: systemd-logind.service
+    state: reloaded
+  when: systemd_is_booted
