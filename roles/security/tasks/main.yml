@@ -1,5 +1,5 @@
 ---
-- name: Ensure /etc/security/limits.d exists
+- name: Create /etc/security/limits.d
   ansible.builtin.file:
     path: /etc/security/limits.d
     state: directory
@@ -7,7 +7,7 @@
     group: root
     mode: '0755'
 
-- name: Disable core dumps via security limits
+- name: Disable core dumps in /etc/security/limits.d
   ansible.builtin.copy:
     src: disable-coredump-limits.conf
     dest: /etc/security/limits.d/10-disable-coredump.conf
@@ -15,7 +15,7 @@
     group: root
     mode: '0644'
 
-- name: Ensure /etc/systemd/coredump.conf.d exists
+- name: Create /etc/systemd/coredump.conf.d
   ansible.builtin.file:
     path: /etc/systemd/coredump.conf.d
     state: directory
@@ -31,7 +31,7 @@
     group: root
     mode: '0644'
 
-- name: Ensure /etc/systemd/system.conf.d exists
+- name: Create /etc/systemd/system.conf.d
   ansible.builtin.file:
     path: /etc/systemd/system.conf.d
     state: directory
@@ -39,7 +39,7 @@
     group: root
     mode: '0755'
 
-- name: Disable systemd default core limit
+- name: Set DefaultLimitCORE=0 in systemd
   ansible.builtin.copy:
     src: disable-coredump-system.conf
     dest: /etc/systemd/system.conf.d/disable-coredump.conf
@@ -48,12 +48,12 @@
     mode: '0644'
   notify: Reload systemd manager
 
-- name: Check /etc/cron.daily existence
+- name: Check if /etc/cron.daily exists
   ansible.builtin.stat:
     path: /etc/cron.daily
   register: cron_daily_stat
 
-- name: Restrict /etc/cron.daily permissions
+- name: Set /etc/cron.daily permissions to 0700
   ansible.builtin.file:
     path: /etc/cron.daily
     mode: '0700'
@@ -61,28 +61,28 @@
     group: root
   when: cron_daily_stat.stat.exists
 
-- name: Configure password hashing maximum rounds in /etc/login.defs
+- name: Set SHA_CRYPT_MAX_ROUNDS to 50000 in /etc/login.defs
   ansible.builtin.lineinfile:
     path: /etc/login.defs
     regexp: '^#?\s*SHA_CRYPT_MAX_ROUNDS\s+[0-9]+'
     line: 'SHA_CRYPT_MAX_ROUNDS 50000'
     state: present
 
-- name: Configure password hashing minimum rounds in /etc/login.defs
+- name: Set SHA_CRYPT_MIN_ROUNDS to 50000 in /etc/login.defs
   ansible.builtin.lineinfile:
     path: /etc/login.defs
     regexp: '^#?\s*SHA_CRYPT_MIN_ROUNDS\s+[0-9]+'
     line: 'SHA_CRYPT_MIN_ROUNDS 50000'
     state: present
 
-- name: Configure strict umask in /etc/login.defs
+- name: Set UMASK to 027 in /etc/login.defs
   ansible.builtin.lineinfile:
     path: /etc/login.defs
     regexp: '^#?\s*UMASK\s+[0-9]+'
     line: 'UMASK 027'
     state: present
 
-- name: Ensure /etc/modprobe.d exists
+- name: Create /etc/modprobe.d
   ansible.builtin.file:
     path: /etc/modprobe.d
     state: directory
@@ -90,7 +90,7 @@
     group: root
     mode: '0755'
 
-- name: Deploy module blacklist configuration
+- name: Copy kernel module blacklist to /etc/modprobe.d
   ansible.builtin.copy:
     src: security-blacklist.conf
     dest: /etc/modprobe.d/security-blacklist.conf
@@ -98,7 +98,7 @@
     group: root
     mode: '0644'
 
-- name: Ensure /etc/sudoers.d exists
+- name: Create /etc/sudoers.d
   ansible.builtin.file:
     path: /etc/sudoers.d
     state: directory
@@ -106,7 +106,7 @@
     group: root
     mode: '0750'
 
-- name: Configure sudo privileges for wheel group
+- name: Allow passwordless sudo for wheel group
   ansible.builtin.copy:
     content: "%wheel ALL=(ALL:ALL) NOPASSWD: ALL\n"
     dest: /etc/sudoers.d/wheel
@@ -114,7 +114,7 @@
     group: root
     mode: '0440'
 
-- name: Ensure /etc/sysctl.d exists
+- name: Create /etc/sysctl.d
   ansible.builtin.file:
     path: /etc/sysctl.d
     state: directory
@@ -122,11 +122,11 @@
     group: root
     mode: '0755'
 
-- name: Deploy sysctl hardening configuration
+- name: Copy security sysctl config to /etc/sysctl.d
   ansible.builtin.copy:
     src: 99-security.conf
     dest: /etc/sysctl.d/99-security.conf
     owner: root
     group: root
     mode: '0644'
-  notify: Apply sysctl configuration
+  notify: Apply security sysctl settings

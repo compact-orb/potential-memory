@@ -1,5 +1,5 @@
 ---
-- name: Reinstall and reload apparmor profiles
+- name: Reinstall and reload AppArmor profiles
   ansible.builtin.command:
     cmd: >-
       aa-install --install{{ ' --no-reload' if not systemd_is_booted else '' }}
@@ -7,7 +7,7 @@
     DISTRIBUTION: arch
   changed_when: true
 
-- name: Reload apparmor profiles
+- name: Reload AppArmor profiles
   ansible.builtin.command:
     cmd: /usr/share/apparmor/apparmor_load.sh
   changed_when: true

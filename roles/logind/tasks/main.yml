@@ -1,5 +1,5 @@
 ---
-- name: Ensure /etc/systemd/logind.conf.d exists
+- name: Create /etc/systemd/logind.conf.d
   ansible.builtin.file:
     path: /etc/systemd/logind.conf.d
     state: directory
@@ -7,7 +7,7 @@
     group: root
     mode: '0755'
 
-- name: Deploy logind lid switch configuration
+- name: Copy lid switch config to /etc/systemd/logind.conf.d
   ansible.builtin.copy:
     src: disable-lid-suspend.conf
     dest: /etc/systemd/logind.conf.d/disable-lid-suspend.conf

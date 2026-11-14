@@ -1,5 +1,5 @@
 ---
-- name: Ensure /var/cache/apparmor exists with restricted permissions
+- name: Create /var/cache/apparmor with mode 0700
   ansible.builtin.file:
     path: /var/cache/apparmor
     state: directory
@@ -7,7 +7,7 @@
     group: root
     mode: '0700'
 
-- name: Ensure /etc/apparmor directories exist
+- name: Create AppArmor configuration directories
   ansible.builtin.file:
     path: "{{ item }}"
     state: directory
@@ -20,67 +20,67 @@
     - /etc/apparmor.d/local
     - /etc/apparmor.d/abstractions/authentication.d
 
-- name: Deploy /etc/apparmor/modes configuration
+- name: Copy /etc/apparmor/modes
   ansible.builtin.copy:
     src: modes
     dest: /etc/apparmor/modes
     owner: root
     group: root
     mode: '0644'
-  notify: Reinstall and reload apparmor profiles
+  notify: Reinstall and reload AppArmor profiles
 
-- name: Mask vendor flags to default all profiles to enforce mode
+- name: Copy AppArmor flag overrides to /etc/apparmor/flags.d
   ansible.builtin.copy:
     src: flags.d/
     dest: /etc/apparmor/flags.d/
     owner: root
     group: root
     mode: '0644'
-  notify: Reinstall and reload apparmor profiles
+  notify: Reinstall and reload AppArmor profiles
 
-- name: Deploy /etc/apparmor/parser.conf configuration
+- name: Copy /etc/apparmor/parser.conf
   ansible.builtin.copy:
     src: parser.conf
     dest: /etc/apparmor/parser.conf
     owner: root
     group: root
     mode: '0644'
-  notify: Reload apparmor profiles
+  notify: Reload AppArmor profiles
 
-- name: Deploy PAM abstraction vendor override
+- name: Copy Gentoo PAM AppArmor abstraction
   ansible.builtin.copy:
     src: abstractions/gentoo.conf
     dest: /etc/apparmor.d/abstractions/authentication.d/gentoo.conf
     owner: root
     group: root
     mode: '0644'
-  notify: Reload apparmor profiles
+  notify: Reload AppArmor profiles
 
-- name: Deploy local profile drop-ins
+- name: Copy local AppArmor profile overrides
   ansible.builtin.copy:
     src: local/
     dest: /etc/apparmor.d/local/
     owner: root
     group: root
     mode: '0644'
-  notify: Reload apparmor profiles
+  notify: Reload AppArmor profiles
 
-- name: Remove obsolete local profile drop-ins
+- name: Remove old local AppArmor profile overrides
   ansible.builtin.file:
     path: "/etc/apparmor.d/local/{{ item }}"
     state: absent
   loop:
     - aa-install
     - aa-mode
-  notify: Reload apparmor profiles
+  notify: Reload AppArmor profiles
 
-- name: Ensure auditd.service is enabled and running
+- name: Enable and start auditd.service
   ansible.builtin.systemd_service:
     name: auditd.service
     enabled: true
     state: "{{ 'started' if systemd_is_booted else omit }}"
 
-- name: Ensure apparmor.d profiles are installed
+- name: Install apparmor.d profiles
   ansible.builtin.command:
     cmd: >-
       aa-install --install{{ ' --no-reload' if not systemd_is_booted else '' }}
@@ -89,7 +89,7 @@
   args:
     creates: /etc/apparmor/install.db
 
-- name: Ensure apparmor.service is enabled and running
+- name: Enable and start apparmor.service
   ansible.builtin.systemd_service:
     name: apparmor.service
     enabled: true

@@ -1,5 +1,5 @@
 ---
-- name: Configuration
+- name: Configure local Gentoo system
   hosts: localhost
   connection: local
   gather_facts: false
@@ -16,7 +16,7 @@
       failed_when: false
       check_mode: false
 
-    - name: Set systemd active fact
+    - name: Set systemd_is_booted fact
       ansible.builtin.set_fact:
         systemd_is_booted: >-
           {{ _systemd_check.stdout in

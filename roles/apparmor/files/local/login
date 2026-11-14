@@ -1,2 +1,2 @@
-  # Allow reading Gentoo environment profile
+  # Allow reading Gentoo environment file
   @{etc_ro}/profile.env r,

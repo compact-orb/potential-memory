@@ -1,5 +1,5 @@
 ---
-- name: Apply sysctl configuration
+- name: Apply security sysctl settings
   ansible.builtin.command:
     cmd: /usr/lib/systemd/systemd-sysctl /etc/sysctl.d/99-security.conf
   when: systemd_is_booted

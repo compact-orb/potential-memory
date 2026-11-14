@@ -1,7 +1,7 @@
 ---
-# === Public Keys Management ===
+# Public keys
 
-- name: Create /etc/portage/keys directory
+- name: Create /etc/portage/keys
   ansible.builtin.file:
     path: /etc/portage/keys
     state: directory
@@ -9,7 +9,7 @@
     group: root
     mode: '0755'
 
-- name: Install public keys
+- name: Copy public keys to /etc/portage/keys
   ansible.builtin.copy:
     src: "{{ item }}"
     dest: "/etc/portage/keys/{{ item }}"
@@ -20,7 +20,7 @@
     - binpkg.asc
     - automatic-journey-repo.asc
 
-# === GnuPG Binpkg Verification ===
+# GnuPG binpkg verification
 
 - name: Initialize /etc/portage/gnupg with getuto
   ansible.builtin.command:
@@ -48,9 +48,9 @@
     gpgconf --homedir /etc/portage/gnupg --kill all 2> /dev/null || true
   when: gpg_import.changed
 
-# === Ebuild Repositories ===
+# Ebuild repositories
 
-- name: Ensure /var/db/repos directory exists with portage ownership
+- name: Create /var/db/repos owned by portage
   ansible.builtin.file:
     path: /var/db/repos
     state: directory
@@ -58,7 +58,7 @@
     group: portage
     mode: '0755'
 
-- name: Create /etc/portage/repos.conf directory
+- name: Create /etc/portage/repos.conf
   ansible.builtin.file:
     path: /etc/portage/repos.conf
     state: directory
@@ -119,15 +119,15 @@
     group: root
     mode: '0644'
 
-# === Binary Package Repositories ===
+# Binary package repositories
 
-- name: Detect active Portage profile symlink
+- name: Check /etc/portage/make.profile symlink
   ansible.builtin.stat:
     path: /etc/portage/make.profile
     follow: false
   register: profile_stat
 
-- name: Verify /etc/portage/make.profile is a valid profile symlink
+- name: Verify /etc/portage/make.profile points to a profile
   ansible.builtin.assert:
     that:
       - profile_stat.stat.islnk is defined
@@ -135,17 +135,17 @@
       - "'/profiles/' in profile_stat.stat.lnk_target"
     fail_msg: >-
       /etc/portage/make.profile is not a valid profile symlink.
-      Cannot detect binpkg repository.
+      Cannot detect the binpkg repository.
     quiet: true
 
-- name: Extract detected repository and profile path
+- name: Extract repository and profile names from symlink
   ansible.builtin.set_fact:
     detected_repo: >-
       {{ profile_stat.stat.lnk_target.split('/profiles/')[0].split('/')[-1] }}
     detected_profile: >-
       {{ profile_stat.stat.lnk_target.split('/profiles/')[1] }}
 
-- name: Create /etc/portage/binrepos.conf directory
+- name: Create /etc/portage/binrepos.conf
   ansible.builtin.file:
     path: /etc/portage/binrepos.conf
     state: directory
@@ -153,7 +153,7 @@
     group: root
     mode: '0755'
 
-- name: Configure binary package repository for detected repository
+- name: Configure binpkg repository for detected profile
   ansible.builtin.copy:
     dest: "/etc/portage/binrepos.conf/{{ detected_repo }}.conf"
     content: |

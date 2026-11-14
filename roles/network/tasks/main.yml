@@ -1,5 +1,5 @@
 ---
-- name: Create systemd-resolved stub-resolv.conf symlink
+- name: Link /etc/resolv.conf to systemd-resolved stub
   ansible.builtin.file:
     src: /run/systemd/resolve/stub-resolv.conf
     dest: /etc/resolv.conf
@@ -30,7 +30,7 @@
     - systemd-resolved.service
     - sshd.service
 
-- name: Ensure /etc/sysctl.d exists
+- name: Create /etc/sysctl.d
   ansible.builtin.file:
     path: /etc/sysctl.d
     state: directory
@@ -38,16 +38,16 @@
     group: root
     mode: '0755'
 
-- name: Deploy FQ and BBR sysctl configuration
+- name: Copy FQ and BBR sysctl config to /etc/sysctl.d
   ansible.builtin.copy:
     src: 50-bbr.conf
     dest: /etc/sysctl.d/50-bbr.conf
     owner: root
     group: root
     mode: '0644'
-  notify: Apply network sysctl configuration
+  notify: Apply network sysctl settings
 
-- name: Ensure /etc/NetworkManager/conf.d exists
+- name: Create /etc/NetworkManager/conf.d
   ansible.builtin.file:
     path: /etc/NetworkManager/conf.d
     state: directory
@@ -55,7 +55,7 @@
     group: root
     mode: '0755'
 
-- name: Deploy NetworkManager unmanaged devices configuration
+- name: Copy unmanaged VPN interface config to NetworkManager
   ansible.builtin.copy:
     src: 10-unmanaged-vpn.conf
     dest: /etc/NetworkManager/conf.d/10-unmanaged-vpn.conf
