@@ -75,13 +75,6 @@
     line: 'SHA_CRYPT_MIN_ROUNDS 50000'
     state: present
 
-- name: Set UMASK to 027 in /etc/login.defs
-  ansible.builtin.lineinfile:
-    path: /etc/login.defs
-    regexp: '^#?\s*UMASK\s+[0-9]+'
-    line: 'UMASK 027'
-    state: present
-
 - name: Create /etc/modprobe.d
   ansible.builtin.file:
     path: /etc/modprobe.d

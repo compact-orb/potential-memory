@@ -4,6 +4,7 @@ Wants=network-online.target
 
 [Service]
 ExecStart=/usr/bin/ansible-pull \
+    --only-if-changed \
     --url=https://github.com/compact-orb/potential-memory.git
 LockPersonality=yes
 MemoryDenyWriteExecute=yes
@@ -21,5 +22,4 @@ RestrictSUIDSGID=yes
 SuccessExitStatus=0
 SystemCallArchitectures=native
 Type=oneshot
-UMask=0027
 
