@@ -31,3 +31,4 @@
     - apparmor
     - zram
     - logind
+    - ntsync

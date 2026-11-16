@@ -1,0 +1,17 @@
+---
+- name: Create /etc/modules-load.d
+  ansible.builtin.file:
+    path: /etc/modules-load.d
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: Copy ntsync.conf to /etc/modules-load.d
+  ansible.builtin.copy:
+    src: ntsync.conf
+    dest: /etc/modules-load.d/ntsync.conf
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Restart systemd-modules-load
