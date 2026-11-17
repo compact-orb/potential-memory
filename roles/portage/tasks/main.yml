@@ -119,6 +119,18 @@
     group: root
     mode: '0644'
 
+- name: Configure gentoo-zh ebuild repository
+  ansible.builtin.copy:
+    dest: /etc/portage/repos.conf/gentoo-zh.conf
+    content: |
+      [gentoo-zh]
+      location = /var/db/repos/gentoo-zh
+      sync-type = git
+      sync-uri = https://github.com/compact-orb/gentoo-zh.git
+    owner: root
+    group: root
+    mode: '0644'
+
 # Binary package repositories
 
 - name: Check /etc/portage/make.profile symlink
