@@ -123,3 +123,19 @@
     group: root
     mode: '0644'
   notify: Apply security sysctl settings
+
+- name: Create /etc/environment.d
+  ansible.builtin.file:
+    path: /etc/environment.d
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: Copy SSH_AUTH_SOCK config to /etc/environment.d
+  ansible.builtin.copy:
+    src: 10-ssh-auth-sock.conf
+    dest: /etc/environment.d/10-ssh-auth-sock.conf
+    owner: root
+    group: root
+    mode: '0644'
