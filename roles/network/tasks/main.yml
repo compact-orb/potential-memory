@@ -6,21 +6,6 @@
     state: link
     force: true
 
-- name: Configure /etc/hosts loopback entries
-  vars:
-    _hostname: >-
-      {{ lookup('ansible.builtin.file', '/etc/hostname', errors='ignore') |
-         default('', true) | trim }}
-  ansible.builtin.lineinfile:
-    path: /etc/hosts
-    regexp: "^{{ item }}\\s+"
-    line: "{{ item }}\tlocalhost{{ (' ' + _hostname)
-            if (_hostname and _hostname != 'localhost') else '' }}"
-    state: present
-  loop:
-    - '127.0.0.1'
-    - '::1'
-
 - name: Disable and stop systemd-networkd services
   ansible.builtin.systemd_service:
     name: "{{ item }}"

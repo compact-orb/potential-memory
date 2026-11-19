@@ -22,17 +22,3 @@
     name: ansible-pull.timer
     enabled: true
     state: "{{ 'started' if systemd_is_booted else omit }}"
-
-- name: Copy ansible-pull firstboot service to /etc/systemd/system
-  ansible.builtin.copy:
-    src: ansible-pull-firstboot.service
-    dest: /etc/systemd/system/ansible-pull-firstboot.service
-    owner: root
-    group: root
-    mode: '0644'
-  notify: Reload systemd manager
-
-- name: Enable ansible-pull firstboot service
-  ansible.builtin.systemd_service:
-    name: ansible-pull-firstboot.service
-    enabled: true
