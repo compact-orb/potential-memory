@@ -124,6 +124,7 @@
     mode: '0644'
   notify: Apply security sysctl settings
 
+# Workaround: Gentoo bug #964756 / upstream GCR issue #55 (propagate to D-Bus)
 - name: Create /etc/environment.d
   ansible.builtin.file:
     path: /etc/environment.d
