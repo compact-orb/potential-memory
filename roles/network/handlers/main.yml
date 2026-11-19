@@ -1,7 +1,7 @@
 ---
 - name: Apply network sysctl settings
   ansible.builtin.command:
-    cmd: /usr/lib/systemd/systemd-sysctl /etc/sysctl.d/50-bbr.conf
+    cmd: /usr/lib/systemd/systemd-sysctl /etc/sysctl.d/99-bbr.conf
   when: systemd_is_booted
 
 - name: Reload NetworkManager

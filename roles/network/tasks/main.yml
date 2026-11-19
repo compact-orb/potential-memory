@@ -40,8 +40,8 @@
 
 - name: Copy FQ and BBR sysctl config to /etc/sysctl.d
   ansible.builtin.copy:
-    src: 50-bbr.conf
-    dest: /etc/sysctl.d/50-bbr.conf
+    src: 99-bbr.conf
+    dest: /etc/sysctl.d/99-bbr.conf
     owner: root
     group: root
     mode: '0644'
